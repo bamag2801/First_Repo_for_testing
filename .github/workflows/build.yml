@@ -1,28 +1,31 @@
-name: Build and Test
-
+name: Flutter Build
+ 
 on:
   push:
     branches:
-      - main
-
+      - main # Change this to your main branch name
+ 
 jobs:
   build:
     runs-on: ubuntu-latest
-
+ 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v10
-        with:
-          flutter-version: '3.13.2' # Replace with your desired Flutter version
-
-      - name: Install dependencies
-        run: flutter pub get
-
-      - name: Build APK
-        run: flutter build apk
-
-      - name: Run tests
-        run: flutter test
+    - name: Checkout code
+      uses: actions/checkout@v2
+ 
+    - name: Set up Flutter
+      uses: subosito/flutter-action@v1
+      with:
+        flutter-version: 3.13.2 # Use the desired Flutter version
+ 
+    - name: Install dependencies
+      run: flutter pub get
+ 
+    - name: Build Flutter App
+      run: flutter build apk # or flutter build ios for iOS builds
+ 
+    - name: Archive artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: app-release
+        path: build/app/outputs/apk/release/app-release.apk # Adjust the path to your build artifacts
