@@ -1,38 +1,31 @@
-name: Build Flutter APK
+name: Flutter Build
  
 on:
   push:
     branches:
-      - main
+      - main # Change this to your main branch name
  
 jobs:
   build:
     runs-on: ubuntu-latest
-
+ 
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
  
     - name: Set up Flutter
-      uses: subosito/flutter-action@v2
+      uses: subosito/flutter-action@v1
       with:
-        flutter-version: 3.13.2
+        flutter-version: 3.13.2 # Use the desired Flutter version
  
     - name: Install dependencies
       run: flutter pub get
  
-    - name: Build APK
-      run: flutter build apk --release
+    - name: Build Flutter App
+      run: flutter build apk # or flutter build ios for iOS builds
  
-    - name: Archive APK
+    - name: Archive artifacts
       uses: actions/upload-artifact@v2
       with:
         name: app-release
         path: build/app/outputs/apk/release/app-release.apk
- 
-    - name: Get Artifact URL
-      id: get_url
-      run: echo "::set-output name=url::$(echo '${{ steps.build.outputs.artifacts }}' | jq -r '.app-release')"
- 
-    - name: Output URL
-      run: echo "Download your APK from: ${{ steps.get_url.outputs.url }}"
