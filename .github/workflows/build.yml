@@ -1,76 +1,36 @@
-
-name: Build and Deploy Flutter iOS App
+name: Build and Release iOS App
 
  
 
 on:
-
   push:
-
     branches:
-
       - main
 
  
 
 jobs:
-
-  build_and_deploy:
-
+  build:
     runs-on: macos-latest
 
- 
-
     steps:
-
-    - name: Checkout code
-
+    - name: Check out the code
       uses: actions/checkout@v2
 
  
 
     - name: Set up Flutter
-
-      uses: subosito/flutter-action@v2
-
-      with:
-
-        flutter-version: 3.13.2
+      uses: subosito/flutter-action@v1
 
  
 
-    - name: Install dependencies
-
-      run: flutter pub get
-
- 
-
-    - name: Build iOS App
-
-      run: flutter build ios --release --no-codesign
+    - name: Build iOS app
+      run: flutter build ios
 
  
 
-    - name: Archive iOS App
-
+    - name: Upload Artifact
       uses: actions/upload-artifact@v2
-
       with:
-
-        name: app-release
-
+        name: ios-app
         path: build/ios/iphoneos/Runner.app
-
- 
-
-    - name: Get Artifact URL
-
-      id: get_url
-
-      run: echo "::set-output name=url::$(echo '${{ steps.build_and_deploy.outputs.artifacts }}' | jq -r '.app-release')"
-
- 
-
-    - name: Output URL
-
-      run: echo "Download your iOS app from: ${{ steps.get_url.outputs.url }}"
