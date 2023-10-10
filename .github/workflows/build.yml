@@ -1,37 +1,75 @@
-name: iOS Build
+name: Build Flutter iOS App
+
+ 
 
 on:
+
   push:
+
     branches:
+
       - main
 
+ 
+
 jobs:
+
   build:
+
     runs-on: macos-latest
-    
+
+ 
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
 
-      - name: Set up Xcode
-        uses: actions/setup-xcode@v2
-        with:
-          xcode-version: '15.0'
+    - name: Checkout code
 
-      - name: Install dependencies
-        run: |
-          pod install
+      uses: actions/checkout@v2
 
-      - name: Build and archive the app
-        run: |
-          xcodebuild -workspace YourApp.xcworkspace -scheme YourApp -configuration Release -archivePath $PWD/build/YourApp.xcarchive archive
+ 
 
-      - name: Export the archive as an IPA
-        run: |
-          xcodebuild -exportArchive -archivePath $PWD/build/YourApp.xcarchive -exportOptionsPlist ExportOptions.plist -exportPath $PWD/build
+    - name: Set up Flutter
 
-      - name: Upload IPA
-        uses: actions/upload-artifact@v2
-        with:
-          name: YourApp-IPA
-          path: build/*.ipa
+      uses: subosito/flutter-action@v2
+
+      with:
+
+        flutter-version: 3.13.2
+
+ 
+
+    - name: Install dependencies
+
+      run: flutter pub get
+
+ 
+
+    - name: Build iOS App
+
+      run: flutter build ios --release
+
+ 
+
+    - name: Archive iOS App
+
+      uses: actions/upload-artifact@v2
+
+      with:
+
+        name: app-release
+
+        path: build/ios/iphoneos/Runner.app
+
+ 
+
+    - name: Get Artifact URL
+
+      id: get_url
+
+      run: echo "::set-output name=url::$(echo '${{ steps.build.outputs.artifacts }}' | jq -r '.app-release')"
+
+ 
+
+    - name: Output URL
+
+      run: echo "Download your iOS app from: ${{ steps.get_url.outputs.url }}"
