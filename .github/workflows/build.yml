@@ -1,31 +1,37 @@
-name: Flutter Build
- 
+name: iOS Build
+
 on:
   push:
     branches:
-      - main # Change this to your main branch name
- 
+      - main
+
 jobs:
   build:
-    runs-on: ubuntu-latest
- 
+    runs-on: macos-latest
+    
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
- 
-    - name: Set up Flutter
-      uses: subosito/flutter-action@v1
-      with:
-        flutter-version: 3.13.2 # Use the desired Flutter version
- 
-    - name: Install dependencies
-      run: flutter pub get
- 
-    - name: Build Flutter App
-      run: flutter build apk # or flutter build ios for iOS builds
- 
-    - name: Archive artifacts
-      uses: actions/upload-artifact@v2
-      with:
-        name: app-release
-        path: build/app/outputs/apk/release/app-release.apk
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Xcode
+        uses: actions/setup-xcode@v2
+        with:
+          xcode-version: '15.0'
+
+      - name: Install dependencies
+        run: |
+          pod install
+
+      - name: Build and archive the app
+        run: |
+          xcodebuild -workspace YourApp.xcworkspace -scheme YourApp -configuration Release -archivePath $PWD/build/YourApp.xcarchive archive
+
+      - name: Export the archive as an IPA
+        run: |
+          xcodebuild -exportArchive -archivePath $PWD/build/YourApp.xcarchive -exportOptionsPlist ExportOptions.plist -exportPath $PWD/build
+
+      - name: Upload IPA
+        uses: actions/upload-artifact@v2
+        with:
+          name: YourApp-IPA
+          path: build/*.ipa
