@@ -1,28 +1,34 @@
-name: Build iOS Application
-
- 
+name: iOS Build
 
 on:
   push:
     branches:
       - main
- 
- 
- 
+
 jobs:
   build:
     runs-on: macos-latest
+
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Set up Flutter
-      uses: subosito/flutter-action@v1
-      with:
-        flutter-version: '3.13.2' # Specify the Flutter version you want to use
+      - name: Set up Xcode
+        uses: actions/setup-xcode@v2
+        with:
+          xcode-version: 15.0 # Adjust to your Xcode version
 
-    - name: Get dependencies
-      run: flutter pub get
+      - name: Install dependencies
+        run: |
+          gem install bundler
+          bundle install
 
-    - name: Build iOS application
-      run: flutter build ios
+      - name: Build and test iOS app
+        run: |
+          xcodebuild clean build \
+            -workspace YourApp.xcworkspace \
+            -scheme YourApp \
+            -destination "platform=iOS Simulator,OS=latest,name=iPhone 11"
+
+      # You can add more steps for deployment, testing, etc. based on your requirements
+
